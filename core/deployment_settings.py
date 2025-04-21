@@ -34,12 +34,8 @@ STORAGES = {
 }
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'academic_db',       # Nombre de la DB
-        'USER': 'academica1',        # Usuario PostgreSQL
-        'PASSWORD': 'gestionacademica', # Contraseña PostgreSQL
-        'HOST': 'localhost',         # Si PostgreSQL está instalado localmente
-        'PORT': '5432',
-    }
+    'default': dj_database_url.config(
+      default=os.environ['DATABASE_URL'],
+      conn_max_age=600
+    )
 }
