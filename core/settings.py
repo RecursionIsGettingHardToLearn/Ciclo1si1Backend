@@ -28,6 +28,14 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'api',
+    'apps.usuarios',
+    'apps.asistenca',
+    'apps.academico',
+    'apps.calendario',          # Apps creadas y vinculadas
+    'apps.estudiantes',         # en settings.py
+    'apps.evaluacion',
+    'apps.institucion',
+    'apps.personal',
 ]
 
 MIDDLEWARE = [
