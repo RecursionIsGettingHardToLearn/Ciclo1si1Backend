@@ -1,7 +1,10 @@
 from pathlib import Path
+import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+sys.path.insert(0, str(BASE_DIR / 'aplicaciones'))
 
 
 # Quick-start development settings - unsuitable for production
@@ -28,14 +31,14 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'api',
-    'apps.usuarios',
-    'apps.asistenca',
-    'apps.academico',
-    'apps.calendario',          # Apps creadas y vinculadas
-    'apps.estudiantes',         # en settings.py
-    'apps.evaluacion',
-    'apps.institucion',
-    'apps.personal',
+    'aplicaciones.usuarios',
+    'aplicaciones.asistencia',
+    'aplicaciones.academico',
+    'aplicaciones.calendario',          # aplicaciones creadas y vinculadas
+    'aplicaciones.estudiantes',         # en settings.py
+    'aplicaciones.evaluacion',
+    'aplicaciones.institucion',
+    'aplicaciones.personal',
 ]
 
 MIDDLEWARE = [
@@ -77,6 +80,8 @@ STATIC_ROOT = BASE_DIR/'staticfiles'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+
+AUTH_USER_MODEL = 'usuarios.Usuario'
 
 DATABASES = {
     'default': {
