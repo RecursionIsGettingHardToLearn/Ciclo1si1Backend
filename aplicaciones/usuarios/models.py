@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
+from django.conf import settings
 
 class Rol(models.Model):
     nombre = models.CharField(max_length=50, unique=True)
@@ -130,3 +131,24 @@ class Admin(models.Model):
     def __str__(self):
         return f"{self.usuario} - {self.puesto}"
 # Create your models here.
+class Bitacora(models.Model):
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        verbose_name='Usuario'
+    )
+    hora_entrada = models.DateTimeField(verbose_name='Hora de entrada')
+    hora_salida = models.DateTimeField(
+        verbose_name='Hora de salida',
+        blank=True,
+        null=True
+    )
+
+    class Meta:
+        verbose_name = 'Bitácora de sesión'
+        verbose_name_plural = 'Bitácoras de sesión'
+        db_table = 'bitacora_sesion'
+        ordering = ['-hora_entrada']
+
+    def __str__(self):
+        return f"{self.usuario} entró {self.hora_entrada:%Y-%m-%d %H:%M:%S}"
