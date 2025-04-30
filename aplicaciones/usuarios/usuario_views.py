@@ -15,7 +15,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.utils import timezone
 from rest_framework.decorators import permission_classes
 
-@permission_classes(AllowAny)
+@permission_classes([AllowAny])
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
     serializer_class = UsuarioSerializer
@@ -23,8 +23,12 @@ class UsuarioViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def register(self, request):
+        
+
         serializer = self.get_serializer(data=request.data)
+        
         serializer.is_valid(raise_exception=True)
+        print('paso hasta aqi   ')
         user = serializer.save()
         return Response({
             'user': serializer.data,

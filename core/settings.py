@@ -97,8 +97,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'academic_db',       # Nombre de la DB
-        'USER': 'academica1',        # Usuario PostgreSQL
-        'PASSWORD': 'gestionacademica', # Contraseña PostgreSQL
+        'USER': 'postgres',        # Usuario PostgreSQL
+        'PASSWORD': 'postgres', # Contraseña PostgreSQL
         'HOST': 'localhost',         # Si PostgreSQL está instalado localmente
         'PORT': '5432',
     }
