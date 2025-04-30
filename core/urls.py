@@ -1,14 +1,9 @@
-
-from django.contrib import admin
 from django.urls import path, include
-from rest_framework import routers, serializers, viewsets
-from django.http import HttpResponse
-
-
+from django.views.generic import TemplateView
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path("usuarios/", include("aplicaciones.usuarios.urls")),
-    path("", lambda request: HttpResponse("¡Hola desde Django en Render!")),
-    
-]
+    path("user/", include("aplicaciones.usuarios.urls")),  
+    path('', TemplateView.as_view(template_name='index.html')),  # Para servir React
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

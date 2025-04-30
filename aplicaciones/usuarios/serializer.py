@@ -1,149 +1,66 @@
 from rest_framework import serializers
-from .models import (
-    Rol,
-    Usuario,
-    Notificacion,
-    SuperAdmin,
-    Admin,
-    Bitacora
-)
-from django.contrib.auth import authenticate
-from django.utils.translation import gettext_lazy as _
+from .models import Usuario, Rol, Notificacion, Bitacora
+from django.contrib.auth.hashers import make_password
 
 class RolSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rol
-        fields = '__all__'
+        fields = ['id', 'nombre', 'descripcion']
+        read_only_fields = ['id']
+        extra_kwargs = {
+            'nombre': {'required': True, 'allow_blank': False},
+            'descripcion': {'required': False}
+        }
+
+    def validate_nombre(self, value):
+        """
+        Valida que el nombre del rol sea único (insensible a mayúsculas)
+        """
+        if self.instance and self.instance.nombre.lower() == value.lower():
+            return value
+            
+        if Rol.objects.filter(nombre__iexact=value).exists():
+            raise serializers.ValidationError("Ya existe un rol con este nombre")
+        return value
 
 class UsuarioSerializer(serializers.ModelSerializer):
     rol = RolSerializer(read_only=True)
+    rol_id = serializers.PrimaryKeyRelatedField(
+        queryset=Rol.objects.all(),
+        source='rol',
+        write_only=True
+    )
     
     class Meta:
         model = Usuario
         fields = [
-            'id',
-            'ci',
-            'foto',
-            'nombre',
-            'apellido',
-            'email',
-            'edad',
-            'username',
-            'estado',
-            'rol',
-            'telefono',
-            'is_staff',
-            'is_active',
+            'id', 'ci', 'username', 'email', 'nombre', 'apellido',
+            'edad', 'foto', 'telefono', 'rol', 'rol_id', 'is_active',
             'date_joined'
         ]
         extra_kwargs = {
-            'password': {'write_only': True}
+            'password': {'write_only': True},
+            'is_active': {'read_only': True},
+            'date_joined': {'read_only': True}
         }
-
-class UsuarioCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Usuario
-        fields = [
-            'ci',
-            'nombre',
-            'apellido',
-            'email',
-            'username',
-            'password',
-            'rol',
-            'telefono'
-        ]
-        extra_kwargs = {
-            'password': {'write_only': True}
-        }
-
+    
     def create(self, validated_data):
-        user = Usuario.objects.create_user(
-            ci=validated_data['ci'],
-            email=validated_data['email'],
-            nombre=validated_data['nombre'],
-            apellido=validated_data['apellido'],
-            username=validated_data['username'],
-            password=validated_data['password'],
-            rol=validated_data.get('rol'),
-            telefono=validated_data.get('telefono')
-        )
-        return user
+        validated_data['password'] = make_password(validated_data.get('password'))
+        return super().create(validated_data)
 
-class AuthTokenSerializer(serializers.Serializer):
+class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
-    password = serializers.CharField(
-        style={'input_type': 'password'},
-        trim_whitespace=False
-    )
-
-    def validate(self, attrs):
-        username = attrs.get('username')
-        password = attrs.get('password')
-
-        if username and password:
-            user = authenticate(request=self.context.get('request'),
-                              username=username, password=password)
-
-            if not user:
-                msg = _('Unable to log in with provided credentials.')
-                raise serializers.ValidationError(msg, code='authorization')
-        else:
-            msg = _('Must include "username" and "password".')
-            raise serializers.ValidationError(msg, code='authorization')
-
-        attrs['user'] = user
-        return attrs
+    password = serializers.CharField(write_only=True)
 
 class NotificacionSerializer(serializers.ModelSerializer):
-    usuario = UsuarioSerializer(read_only=True)
-    
     class Meta:
         model = Notificacion
         fields = '__all__'
-
-class NotificacionCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Notificacion
-        fields = ['usuario', 'titulo', 'mensaje', 'tipo']
-
-class SuperAdminSerializer(serializers.ModelSerializer):
-    usuario = UsuarioSerializer(read_only=True)
-    
-    class Meta:
-        model = SuperAdmin
-        fields = '__all__'
-
-class SuperAdminCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SuperAdmin
-        fields = ['usuario']
-
-class AdminSerializer(serializers.ModelSerializer):
-    usuario = UsuarioSerializer(read_only=True)
-    
-    class Meta:
-        model = Admin
-        fields = '__all__'
-
-class AdminCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Admin
-        fields = ['usuario', 'puesto']
+        read_only_fields = ('fecha', 'usuario')
 
 class BitacoraSerializer(serializers.ModelSerializer):
-    usuario = UsuarioSerializer(read_only=True)
+    usuario = serializers.StringRelatedField()
     
     class Meta:
         model = Bitacora
         fields = '__all__'
-
-class BitacoraCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Bitacora
-        fields = ['usuario', 'hora_entrada']
-
-class BitacoraUpdateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Bitacora
-        fields = ['hora_salida']

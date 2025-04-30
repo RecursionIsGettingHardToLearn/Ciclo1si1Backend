@@ -8,6 +8,7 @@ class Rol(models.Model):
     descripcion = models.TextField(blank=True, null=True)
 
     class Meta:
+        app_label = 'usuarios'
         verbose_name = 'Rol'
         verbose_name_plural = 'Roles'
         db_table = 'rol'
