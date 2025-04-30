@@ -23,12 +23,9 @@ class UsuarioViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def register(self, request):
-        
-
         serializer = self.get_serializer(data=request.data)
-        
-        serializer.is_valid(raise_exception=True)
-        print('paso hasta aqi   ')
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         user = serializer.save()
         return Response({
             'user': serializer.data,
@@ -38,26 +35,31 @@ class UsuarioViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def login(self, request):
         serializer = LoginSerializer(data=request.data)
+        user = Usuario.objects.get(username="1")
+        print("ESTAMAO VERIVANDO LIS ALA CONTRASENA ESTA ENCITOA",user.password) 
+        user = Usuario.objects.get(username="1")
+        print("ESTAMO VERIFCANDDO LA CONTRASENA",user.check_password("1")) 
+        
+        print("Datos iniciales enviados al serializador:", serializer.initial_data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
+
         user = authenticate(
             username=serializer.validated_data['username'],
             password=serializer.validated_data['password']
         )
-        
+        print('user', user)
         if not user:
             return Response(
                 {'error': 'Credenciales inválidas'},
                 status=status.HTTP_401_UNAUTHORIZED
             )
-        
         if not user.is_active:
             return Response(
                 {'error': 'Cuenta desactivada'},
                 status=status.HTTP_403_FORBIDDEN
             )
-        
         token, created = Token.objects.get_or_create(user=user)
         Bitacora.objects.create(usuario=user, hora_entrada=timezone.now())
         
