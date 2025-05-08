@@ -1,6 +1,10 @@
 from pathlib import Path
 import sys
 import os
+FRONTEND_URL = "http://localhost:5173"
+# Solución para entorno de desarrollo
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'no-reply@donbosco.edu'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,8 +43,9 @@ INSTALLED_APPS = [
     'aplicaciones.calendario',          # aplicaciones creadas y vinculadas
     'aplicaciones.estudiantes',         # en settings.py
     'aplicaciones.evaluacion',
-    'aplicaciones.institucion',
+
     'aplicaciones.personal',
+    'aplicaciones.institucion',
 ]
 
 MIDDLEWARE = [

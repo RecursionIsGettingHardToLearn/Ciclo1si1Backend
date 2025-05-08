@@ -51,11 +51,12 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
     email = models.EmailField(max_length=100, unique=True)
-    edad = models.IntegerField(blank=True, null=True)
+    fecha_nacimiento = models.DateField(blank=True, null=True)  # Reemplazo de edad
     username = models.CharField(max_length=50, unique=True)
     estado = models.BooleanField(default=True)
     rol = models.ForeignKey(Rol, on_delete=models.PROTECT)
     telefono = models.CharField(max_length=20, blank=True, null=True)
+    password_reset_pin = models.CharField(max_length=6, blank=True, null=True)
     
     # Campos requeridos para el modelo de usuario personalizado
     is_staff = models.BooleanField(default=False)
@@ -65,7 +66,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     objects = UsuarioManager()
 
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['ci', 'email', 'nombre', 'apellido']
+    REQUIRED_FIELDS = ['ci', 'email', 'nombre', 'apellido', 'fecha_nacimiento']  # Actualización de campos requeridos
 
     class Meta:
         verbose_name = 'Usuario'
@@ -105,10 +106,11 @@ class SuperAdmin(models.Model):
         primary_key=True,
         related_name='superadmin'
     )
+    
 
     class Meta:
         verbose_name = 'Super Administrador'
-        verbose_name_plural = 'Super Administradores'
+        verbose_name_plural = 'Super Administraadores'
         db_table = 'superadmin'
 
     def __str__(self):
@@ -133,6 +135,13 @@ class Admin(models.Model):
         return f"{self.usuario} - {self.puesto}"
 # Create your models here.
 class Bitacora(models.Model):
+    ACCIONES = [
+        ('crear', 'Crear'),
+        ('editar', 'Editar'),
+        ('eliminar', 'Eliminar'),
+        ('ver', 'Ver'),
+        ('otro', 'Otro'),
+    ]
     usuario = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -144,6 +153,12 @@ class Bitacora(models.Model):
         blank=True,
         null=True
     )
+    ip = models.GenericIPAddressField(null=True, blank=True, verbose_name="Dirección IP")
+    tabla = models.CharField(max_length=100, verbose_name='Tabla afectada')
+    accion = models.CharField(max_length=10, choices=ACCIONES)
+    descripcion = models.TextField(blank=True, null=True)
+    fecha = models.DateTimeField(auto_now_add=True)
+    ip = models.GenericIPAddressField(null=True, blank=True)
 
     class Meta:
         verbose_name = 'Bitácora de sesión'

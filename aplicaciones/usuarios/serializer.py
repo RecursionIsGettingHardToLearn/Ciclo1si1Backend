@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Usuario, Rol, Notificacion, Bitacora
 from django.contrib.auth.hashers import make_password
+from usuarios.models import SuperAdmin
 
 class RolSerializer(serializers.ModelSerializer):
     class Meta:
@@ -35,7 +36,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
         model = Usuario
         fields = [
             'id', 'ci', 'username', 'email', 'nombre', 'apellido',
-            'edad', 'foto', 'telefono', 'rol', 'rol_id', 'is_active',
+             'foto', 'telefono', 'fecha_nacimiento', 'rol_id', 'rol', 'is_active',
             'date_joined','password'
         ]
         extra_kwargs = {
@@ -64,3 +65,10 @@ class BitacoraSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bitacora
         fields = '__all__'
+
+class SuperAdminSerializer(serializers.ModelSerializer):
+    usuario = UsuarioSerializer(read_only=True)
+
+    class Meta:
+        model = SuperAdmin
+        fields = ['usuario_id', 'usuario']

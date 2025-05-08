@@ -4,7 +4,8 @@ from usuarios.usuario_views import (
     UsuarioViewSet,
     RolViewSet,
     NotificacionViewSet,
-    BitacoraViewSet
+    BitacoraViewSet,
+    
 )
 
 router = DefaultRouter()
@@ -19,5 +20,12 @@ urlpatterns = [
         path('login/', UsuarioViewSet.as_view({'post': 'login'}), name='login'),
         path('logout/', UsuarioViewSet.as_view({'post': 'logout'}), name='logout'),
         path('register/', UsuarioViewSet.as_view({'post': 'register'}), name='register'),
+        path('cantidad/', UsuarioViewSet.as_view({'get': 'cantidad'}), name='cantidad-usuarios'),
+        path('perfil/', UsuarioViewSet.as_view({'get': 'perfil'}), name='perfil'),
+        
+        path('eliminar-usuario/<int:pk>/', UsuarioViewSet.as_view({'delete': 'eliminar_usuario'}), name='borrar-usuario'),
+        path('editar-usuario/<int:pk>/', UsuarioViewSet.as_view({'put': 'editar_usuario'}), name='editar-usuario'),
+        path('listar-usuarios/', UsuarioViewSet.as_view({'get': 'listar_usuarios'}), name='listar-usuarios'),
+        path('listar-superadmins/', UsuarioViewSet.as_view({'get': 'listar_superadmins'}), name='listar-superadmins'),
     ])),
 ]
